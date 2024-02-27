@@ -1,5 +1,10 @@
 package com.chillmo.gymappdatabase;
 
+import com.chillmo.gymappdatabase.security.PasswordEncoder;
+import com.chillmo.gymappdatabase.users.domain.Role;
+import com.chillmo.gymappdatabase.users.domain.User;
+import com.chillmo.gymappdatabase.users.repository.UserRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -33,6 +38,13 @@ public class GymAppDatabaseApplication {
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsFilter(urlBasedCorsConfigurationSource);
+    }
+    @Bean
+    CommandLineRunner commandLineRunner(UserRepository users, PasswordEncoder passwordEncoder){
+        return args -> {
+            users.save(new User("TestUser",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.USER));
+            users.save(new User("TestAdmin",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.ADMIN));
+        };
     }
 
 
