@@ -1,6 +1,7 @@
 package com.chillmo.gymappdatabase.users.repository;
 
 import com.chillmo.gymappdatabase.users.domain.Token;
+import com.chillmo.gymappdatabase.users.domain.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,5 @@ public interface TokenRepository extends CrudRepository<Token, String> {
 
     Token findTokenByTokenContent(String tokenContent);
 
+    Token findTokenByUser(User user);
 }

@@ -1,5 +1,7 @@
 package com.chillmo.gymappdatabase.users.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +12,7 @@ import lombok.Setter;
 @Table(name = "users",
         uniqueConstraints = {
                 //@UniqueConstraint(columnNames = "twitch"),
-                @UniqueConstraint(columnNames = "username")
+               // @UniqueConstraint(columnNames = "email")
         })
 public class User {
 
@@ -18,9 +20,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
-
+    @Column(name = "email")
+    private String email;
+    @Column
     private String username;
-
     @Lob
     @Column
     private String password;
@@ -28,13 +31,17 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User(){
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Token token;
+
+    public User() {
 
     }
 
-    public User(String username, String password, Role role){
-        this.username = username;
+    public User(String email, String password, Role role) {
+        this.email = email;
+        username = email;
         this.password = password;
-        this.role = Role.USER;
+        this.role = role;
     }
 }

@@ -17,6 +17,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findUserByUsername(String username);
 
+    User findUserByEmail(String email);
+
 
     // List<User> findByParticipatingEventsContaining(Event event);
 

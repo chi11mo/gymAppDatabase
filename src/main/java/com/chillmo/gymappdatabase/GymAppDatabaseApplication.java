@@ -2,7 +2,9 @@ package com.chillmo.gymappdatabase;
 
 import com.chillmo.gymappdatabase.security.PasswordEncoder;
 import com.chillmo.gymappdatabase.users.domain.Role;
+import com.chillmo.gymappdatabase.users.domain.Token;
 import com.chillmo.gymappdatabase.users.domain.User;
+import com.chillmo.gymappdatabase.users.repository.TokenRepository;
 import com.chillmo.gymappdatabase.users.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 @EnableJpaRepositories
 @EnableTransactionManagement
@@ -40,10 +43,11 @@ public class GymAppDatabaseApplication {
         return new CorsFilter(urlBasedCorsConfigurationSource);
     }
     @Bean
-    CommandLineRunner commandLineRunner(UserRepository users, PasswordEncoder passwordEncoder){
+    CommandLineRunner commandLineRunner(UserRepository users, PasswordEncoder passwordEncoder, TokenRepository tokens){
         return args -> {
-            users.save(new User("TestUser",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.USER));
-            users.save(new User("TestAdmin",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.ADMIN));
+            //tokens.save(new Token(LocalDateTime))
+            users.save(new User("TestUser@gmail.de",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.USER));
+            users.save(new User("TestAdmingmail.de",passwordEncoder.bCryptPasswordEncoder().encode("123"), Role.ADMIN));
         };
     }
 

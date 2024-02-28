@@ -3,6 +3,8 @@ package com.chillmo.gymappdatabase.users.service;
 import com.chillmo.gymappdatabase.users.domain.Token;
 import com.chillmo.gymappdatabase.users.domain.User;
 
+import java.util.List;
+
 /**
  * Interface for the TokenService Layer.
  */
@@ -38,4 +40,14 @@ public interface TokenService {
      * @return the User
      */
     User getUserByToken(String tokenContent);
+
+    /**
+     * This method search Token by a User
+     *
+     * @param user for searching Token.
+     * @return Token From the User.
+     */
+    Token getTokenByUser(User user);
+
+    List<Token> getAllTokens();
 }

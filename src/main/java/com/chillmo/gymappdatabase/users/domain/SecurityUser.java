@@ -1,6 +1,5 @@
-package com.chillmo.gymappdatabase.users.controller;
+package com.chillmo.gymappdatabase.users.domain;
 
-import com.chillmo.gymappdatabase.users.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,16 +9,18 @@ import java.util.Collections;
 
 public class SecurityUser implements UserDetails {
 
-    private User user;
+    private final User user;
 
 
-    public SecurityUser(final User user){
+    public SecurityUser(final User user) {
         this.user = user;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
     }
+
 
     @Override
     public String getPassword() {
@@ -28,8 +29,9 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

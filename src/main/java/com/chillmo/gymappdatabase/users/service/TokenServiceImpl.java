@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -29,11 +30,15 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token generateToken(final User user) {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(expiredAtUpdate);
+        LocalDateTime createdAt = LocalDateTime.now();
+
         String tokenContent = UUID.randomUUID().toString();
+
         while (tokenRepository.findTokenByTokenContent(tokenContent) != null) {
             tokenContent = UUID.randomUUID().toString();
         }
-        Token token = new Token(tokenContent, LocalDateTime.now(), expiresAt, null, user);
+        Token token = new Token(tokenContent, createdAt, expiresAt, null, user);
+        user.setToken(token); // Link the token to the user
         return tokenRepository.save(token);
     }
 
@@ -53,4 +58,18 @@ public class TokenServiceImpl implements TokenService {
     public User getUserByToken(final String tokenContent) {
         return tokenRepository.findTokenByTokenContent(tokenContent).getUser();
     }
+
+    @Override
+    public Token getTokenByUser(final User user){
+        return tokenRepository.findTokenByUser(user);
+    }
+
+    @Override
+    public List<Token> getAllTokens() {
+        return (List<Token>) tokenRepository.findAll();
+    }
+
+
+
+
 }

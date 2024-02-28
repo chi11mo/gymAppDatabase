@@ -24,14 +24,22 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/users/signup") // Disable CSRF protection for signup endpoint
+                )
                 .authorizeRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/h2-console/**", "/api/users/signup", "/api/users/verify","/api/users/all").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(myUserDetailsService)
-                .httpBasic(withDefaults())
-                .build();
+                .httpBasic(withDefaults());
+        // Enable debug logging
+
+
+        return http.build();
+
+
     }
 
 

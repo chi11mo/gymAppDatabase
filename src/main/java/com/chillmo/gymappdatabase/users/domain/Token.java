@@ -1,5 +1,6 @@
 package com.chillmo.gymappdatabase.users.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,8 +29,10 @@ public class Token {
     private LocalDateTime expiresAt;
 
     private LocalDateTime confirmedAt;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
     private User user;
 
     /**
@@ -48,6 +51,7 @@ public class Token {
     }
 
     protected Token() {
+
 
     }
 }

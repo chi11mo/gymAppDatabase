@@ -1,10 +1,13 @@
 package com.chillmo.gymappdatabase.users.service;
 
-import com.chillmo.gymappdatabase.users.controller.SecurityUser;
+import com.chillmo.gymappdatabase.users.domain.Role;
+import com.chillmo.gymappdatabase.users.domain.SecurityUser;
 import com.chillmo.gymappdatabase.users.domain.Token;
 import com.chillmo.gymappdatabase.users.domain.User;
 import com.chillmo.gymappdatabase.users.repository.TokenRepository;
 import com.chillmo.gymappdatabase.users.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,20 +30,28 @@ public class UserService implements UserDetailsService {
 
     private final TokenRepository tokenRepository;
 
+    private EntityManager entityManager;
+
 
     /**
      * Service method to add {@link User} to register
-     * and add Twitch profile img to it.
      *
      * @param user {@link User} to add it to User list.
      * @return the added User .
      */
-    public User addUser(User user) {
+    public User registerUser(User user) {
 
 
         final String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        user.setUsername(user.getEmail());
+        user.setRole(Role.USER);
+        //userRepository.save(user);
+
         userRepository.save(user);
+        Token token = tokenServiceImpl.generateToken(user);
+        //tokenRepository.save(token);
+        user.setToken(token);
         //Todo send confirmation Token and sending email
         //tokenServiceImpl.generateToken(user);
         return user;
@@ -150,6 +161,11 @@ public class UserService implements UserDetailsService {
                 .findUserByUsername(username)
                 .map(SecurityUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public User findUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email);
+        return user;
     }
 /*
     @Override
