@@ -21,9 +21,9 @@ public class EmailService {
         String mailContent = "<p>Dear " + user.getEmail() + ",</p>";
         mailContent += "<p>Please click the link below to verify your registration:</p>";
         //tokenRepository.findTokenByUser(user).getTokenContent();
-        //String verifyURL = siteURL + "/verify?token=" + tokenRepository.findTokenByUser(user).getTokenContent();
+        String verifyURL = siteURL + "/verify?token=" + user.getToken().getTokenContent();
 
-       // mailContent += "<h3><a href=\"" + verifyURL + "\">VERIFY</a></h3>";
+        mailContent += "<h3><a href=\"" + verifyURL + "\">VERIFY</a></h3>";
         mailContent += "<p>Thank you<br>Your Company Name</p>";
 
         SimpleMailMessage email = new SimpleMailMessage();

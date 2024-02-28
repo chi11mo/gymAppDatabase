@@ -49,5 +49,10 @@ public interface TokenService {
      */
     Token getTokenByUser(User user);
 
+    /**
+     * This Method search all TokenDto's.
+     *
+     * @return a list of all TokenDto's.
+     */
     List<Token> getAllTokens();
 }

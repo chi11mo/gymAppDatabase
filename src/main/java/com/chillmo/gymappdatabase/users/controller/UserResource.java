@@ -2,7 +2,6 @@ package com.chillmo.gymappdatabase.users.controller;
 
 
 import com.chillmo.gymappdatabase.mail.service.EmailService;
-import com.chillmo.gymappdatabase.users.domain.Role;
 import com.chillmo.gymappdatabase.users.domain.Token;
 import com.chillmo.gymappdatabase.users.domain.User;
 import com.chillmo.gymappdatabase.users.repository.TokenRepository;
@@ -17,20 +16,30 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * The UserResource class is a REST controller that defines the API endpoints for user-related operations.
+ * It allows operations such as retrieving all users, finding a user by ID, updating, deleting, and registering users,
+ * as well as verifying user tokens and resetting passwords.
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserResource {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-
     private final EmailService emailService;
-
     private final TokenServiceImpl tokenService;
-
     private final TokenRepository tokenRepository;
 
-
+    /**
+     * Constructs a new UserResource with the necessary services and repositories.
+     *
+     * @param userService     The service to handle user operations.
+     * @param passwordEncoder The encoder for hashing passwords.
+     * @param tokenService    The service for handling token-related operations.
+     * @param emailService    The service for sending emails.
+     * @param tokenRepository The repository for accessing token data.
+     */
     public UserResource(UserService userService, final PasswordEncoder passwordEncoder,
                         final TokenServiceImpl tokenService, final EmailService emailService, TokenRepository tokenRepository) {
         this.userService = userService;
@@ -40,21 +49,38 @@ public class UserResource {
         this.tokenRepository = tokenRepository;
     }
 
+    /**
+     * Retrieves all users from the database.
+     *
+     * @return A ResponseEntity containing a list of all users and HTTP status OK.
+     */
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUser() {
         List<User> user = userService.findAllUsers();
-        return new ResponseEntity<List<User>>(user, HttpStatus.OK);
-    }
-
-    @GetMapping("/find/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
-        User user = userService.findUserByID(id);
-        // TODO: When user was not found need Response
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @GetMapping("/find/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
+        try {
+            // Attempt to find the user by ID
+            User user = userService.findUserByID(id);
 
-    @CrossOrigin(origins = "http://localhost:4200")
+            // Check if the user object is null
+            if (user == null) {
+                // User not found, return 404 Not Found
+                return new ResponseEntity<>("User not found with ID: " + id, HttpStatus.NOT_FOUND);
+            }
+
+            // User found, return 200 OK with the user data
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            // In case of unexpected server errors, return 500 Internal Server Error
+            return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PutMapping("/update")
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         User updateUser = userService.registerUser(user);
@@ -63,7 +89,6 @@ public class UserResource {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:4200")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
@@ -120,7 +145,7 @@ public class UserResource {
     }
 
     /**
-     * Methode to send a Validationmail again.
+     * Methode to send a Validation mail again.
      *
      * @param token token of the given User
      * @return HttpStatus.OK
@@ -135,30 +160,35 @@ public class UserResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * Endpoint for registering a new user.
+     * This method handles the POST request to register a new user. It checks if a user with the given email
+     * already exists to prevent duplicate entries. If the user does not exist, it proceeds to save the new user
+     * in the database. After successfully saving the user, it generates a verification email and sends it to the
+     * user's email address. The email contains a link for the user to verify their account.
+     *
+     * @param user    The user object containing the new user's data. It is expected to be passed in the body
+     *                of the POST request.
+     * @param request The HttpServletRequest object, used here to extract the URL for creating the verification
+     *                link sent in the verification email.
+     * @return A ResponseEntity object containing the newly created user and the HTTP status. Returns BAD_REQUEST
+     * if the user already exists, otherwise CREATED upon successful registration.
+     */
     @PostMapping("/signup")
-    public HttpStatus registerUser(@RequestBody User user, HttpServletRequest request) {
-        System.out.println("Signup");
-
+    public ResponseEntity<User> registerUser(@RequestBody User user, HttpServletRequest request) {
         if (userService.findUserByEmail(user.getEmail()) != null) {
             // User already exists, handle accordingly
-            return HttpStatus.BAD_REQUEST;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        //String token = tokenService.generateToken(user).getTokenContent();
-        // Save the user to the database
         User savedUser = userService.registerUser(user);
-
-        // Send verification email
-        //String siteURL = request.getRequestURL().toString().replace(request.getRequestURI(), request.getContextPath());
-        //emailService.sendVerificationEmail(savedUser, siteURL);
-        return HttpStatus.CREATED;
+        String siteURL = request.getRequestURL().toString().replace(request.getRequestURI(), request.getContextPath());
+        emailService.sendVerificationEmail(savedUser, siteURL);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
+
 
     @GetMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestParam("token") String token) {
-
-        //User user = userService.verifyToken(token);
-        User user = tokenService.getUserByToken(token);
-
         Token foundToken = tokenService.findTokenByContent(token);
 
         if (foundToken != null) {

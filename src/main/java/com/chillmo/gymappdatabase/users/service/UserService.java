@@ -7,7 +7,6 @@ import com.chillmo.gymappdatabase.users.domain.User;
 import com.chillmo.gymappdatabase.users.repository.TokenRepository;
 import com.chillmo.gymappdatabase.users.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,95 +17,83 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Provides user-related services such as registering users, finding users, and password management.
+ * Implements UserDetailsService for Spring Security integration, enabling user authentication and authorization.
+ */
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-
-
     private final PasswordEncoder passwordEncoder;
-
     private final TokenServiceImpl tokenServiceImpl;
-
     private final TokenRepository tokenRepository;
-
     private EntityManager entityManager;
 
-
     /**
-     * Service method to add {@link User} to register
+     * Registers a new user by encoding their password, setting their role, and saving them to the database.
+     * Additionally, generates a registration token for email verification.
      *
-     * @param user {@link User} to add it to User list.
-     * @return the added User .
+     * @param user User to be registered.
+     * @return The registered user with a verification token.
      */
     public User registerUser(User user) {
-
-
         final String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         user.setUsername(user.getEmail());
         user.setRole(Role.USER);
-        //userRepository.save(user);
-
         userRepository.save(user);
         Token token = tokenServiceImpl.generateToken(user);
-        //tokenRepository.save(token);
         user.setToken(token);
-        //Todo send confirmation Token and sending email
-        //tokenServiceImpl.generateToken(user);
         return user;
-
     }
 
     /**
-     * Service method to get all registered {@link User}.
+     * Retrieves all registered users.
      *
-     * @return a List of all {@link User}.
+     * @return A list of all users.
      */
     public List<User> findAllUsers() {
         return (List<User>) userRepository.findAll();
     }
 
     /**
-     * Service method to find a specific {@link User} by id.
+     * Finds a user by their ID.
      *
-     * @param id for identify the searched {@link User}.
-     * @return the searched {@link User}.
+     * @param id ID of the user to find.
+     * @return The found user or null if not found.
      */
     public User findUserByID(Long id) {
         return userRepository.findUserById(id);
     }
 
     /**
-     * Service method to delete a {@link User} by Id.
+     * Deletes a user by their ID.
      *
-     * @param id id for identify the searched {@link User}.
+     * @param id ID of the user to delete.
      */
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
     /**
-     * Service method to update a {@link User}
+     * Updates a user with new information.
      *
-     * @param newUser new {@link User} to updated.
-     * @return updated {@link User}.
+     * @param newUser The new user information to update.
+     * @return The updated user.
      */
     public User updateUser(final User newUser) {
         final User oldUser = userRepository.findUserById(newUser.getId());
-
         newUser.setId(oldUser.getId());
-
         return userRepository.save(newUser);
     }
 
-
     /**
-     * Service method to reset the given Password for the {@link User}.
+     * Resets a user's password given a token and new password.
      *
-     * @param token       {@link Token}.
-     * @param newPassword the one.
-     * @return response.
+     * @param token       The token indicating a valid password reset request.
+     * @param newPassword The new password to set for the user.
+     * @return A success message.
      */
     public String resetPassword(final String token, final String newPassword) {
         final User user = tokenServiceImpl.getUserByToken(token);
@@ -116,45 +103,48 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * @param token
-     * @return
+     * Checks if a token is valid and if so, activates the corresponding user.
+     *
+     * @param token The token to check.
+     * @return true if the token is valid and the user is activated, false otherwise.
      */
     public boolean checkForToken(final String token) {
         final Token tokenByTokenContent = tokenRepository.findTokenByTokenContent(token);
         final User user = findUserByToken(token);
-
         if (tokenByTokenContent.getExpiresAt().isBefore(LocalDateTime.now())) {
-            //logger.info("Token abgelaufen");
             return false;
         } else {
             setUserIsEnabled(user);
-            // logger.info("User wurde aktiviert");
             return true;
         }
     }
 
     /**
-     * Service method to activated a {@link User}.
+     * Activates a user account.
      *
-     * @param user {@link User}/
+     * @param user The user to activate.
      */
     public void setUserIsEnabled(final User user) {
-        // user.setIsEnabled(true);
         userRepository.save(user);
-
     }
 
     /**
-     * Service method to find a {@link User} by token.
+     * Finds a user associated with a specific token.
      *
-     * @param tokenContent for identify the searched {@link User}.
-     * @return the searched {@link User}.
+     * @param tokenContent The content of the token.
+     * @return The user associated with the token.
      */
     public User findUserByToken(final String tokenContent) {
         return userRepository.findUserById(tokenRepository.findTokenByTokenContent(tokenContent).getUser().getId());
     }
 
-
+    /**
+     * Loads a user by username for authentication purposes.
+     *
+     * @param username The username of the user to load.
+     * @return UserDetails of the loaded user.
+     * @throws UsernameNotFoundException If the user cannot be found.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
@@ -163,14 +153,17 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    /**
+     * Service method to find a {@link User} by their email address.
+     * This method uses the {@link UserRepository} to search for a user with the given email.
+     * If a user with the specified email exists in the database, that user is returned.
+     *
+     * @param email The email address to search for in the user repository.
+     * @return The {@link User} object that matches the given email if found, null otherwise.
+     */
     public User findUserByEmail(String email) {
-        User user = userRepository.findUserByEmail(email);
-        return user;
+        return userRepository.findUserByEmail(email);
     }
-/*
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByeMail(username);
-    }
-    */
+
+
 }

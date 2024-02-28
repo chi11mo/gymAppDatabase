@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -24,12 +23,12 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-         http
+        http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/users/signup") // Disable CSRF protection for signup endpoint
+                        .ignoringRequestMatchers("/api/users/signup", "/api/users/verify") // Disable CSRF protection for signup endpoint
                 )
                 .authorizeRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/api/users/signup", "/api/users/verify","/api/users/all").permitAll()
+                        .requestMatchers("/h2-console/**", "/api/users/signup", "/api/users/verify", "/api/users/all").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(myUserDetailsService)
@@ -41,7 +40,6 @@ public class SecurityConfig {
 
 
     }
-
 
 
 }

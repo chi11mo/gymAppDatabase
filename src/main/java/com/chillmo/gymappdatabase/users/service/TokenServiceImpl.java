@@ -60,7 +60,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Token getTokenByUser(final User user){
+    public Token getTokenByUser(final User user) {
         return tokenRepository.findTokenByUser(user);
     }
 
@@ -68,8 +68,6 @@ public class TokenServiceImpl implements TokenService {
     public List<Token> getAllTokens() {
         return (List<Token>) tokenRepository.findAll();
     }
-
-
 
 
 }
