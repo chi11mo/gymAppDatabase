@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents a user entity within the application.
  * This class is annotated with JPA (Java Persistence API) annotations to define the table mapping for the User entity and its fields.
@@ -43,6 +46,9 @@ public class User {
     // Establishes a one-to-one relationship with the Token entity. The 'mappedBy' attribute indicates that
     // the User entity does not control the relationship (it's the inverse side).
     private Token token;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<HealthData> healthDataRecords = new HashSet<>();
 
     /**
      * Default constructor.

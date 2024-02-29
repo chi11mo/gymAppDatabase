@@ -8,13 +8,13 @@ import com.chillmo.gymappdatabase.users.repository.TokenRepository;
 import com.chillmo.gymappdatabase.users.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,8 +24,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final PasswordEncoder passwordEncoder;
+    @Autowired
     private final TokenServiceImpl tokenServiceImpl;
     private final TokenRepository tokenRepository;
     private EntityManager entityManager;
@@ -79,13 +82,14 @@ public class UserService implements UserDetailsService {
     /**
      * Updates a user with new information.
      *
-     * @param newUser The new user information to update.
+     * @param oldUser The new user information to update.
      * @return The updated user.
      */
-    public User updateUser(final User newUser) {
-        final User oldUser = userRepository.findUserById(newUser.getId());
-        newUser.setId(oldUser.getId());
-        return userRepository.save(newUser);
+    public User updateUser(final User oldUser) {
+        final User updatedUser = userRepository.findUserById(oldUser.getId());
+        updatedUser.setId(oldUser.getId());
+        userRepository.save(updatedUser);
+        return updatedUser;
     }
 
     /**
@@ -102,22 +106,6 @@ public class UserService implements UserDetailsService {
         return "SUCCESS";
     }
 
-    /**
-     * Checks if a token is valid and if so, activates the corresponding user.
-     *
-     * @param token The token to check.
-     * @return true if the token is valid and the user is activated, false otherwise.
-     */
-    public boolean checkForToken(final String token) {
-        final Token tokenByTokenContent = tokenRepository.findTokenByTokenContent(token);
-        final User user = findUserByToken(token);
-        if (tokenByTokenContent.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return false;
-        } else {
-            setUserIsEnabled(user);
-            return true;
-        }
-    }
 
     /**
      * Activates a user account.
@@ -128,15 +116,6 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    /**
-     * Finds a user associated with a specific token.
-     *
-     * @param tokenContent The content of the token.
-     * @return The user associated with the token.
-     */
-    public User findUserByToken(final String tokenContent) {
-        return userRepository.findUserById(tokenRepository.findTokenByTokenContent(tokenContent).getUser().getId());
-    }
 
     /**
      * Loads a user by username for authentication purposes.

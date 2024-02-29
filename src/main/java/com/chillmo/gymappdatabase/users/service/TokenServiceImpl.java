@@ -3,6 +3,7 @@ package com.chillmo.gymappdatabase.users.service;
 import com.chillmo.gymappdatabase.users.domain.Token;
 import com.chillmo.gymappdatabase.users.domain.User;
 import com.chillmo.gymappdatabase.users.repository.TokenRepository;
+import com.chillmo.gymappdatabase.users.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,8 @@ public class TokenServiceImpl implements TokenService {
     @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
     public static final int expiredAtUpdate = 20;
     private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
+
 
     /**
      * Generates a new authentication token for the specified user.
@@ -42,6 +45,8 @@ public class TokenServiceImpl implements TokenService {
         return tokenRepository.save(token);
     }
 
+
+
     @Override
     public Token findTokenByContent(final String content) {
         return tokenRepository.findTokenByTokenContent(content);
@@ -62,6 +67,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token getTokenByUser(final User user) {
         return tokenRepository.findTokenByUser(user);
+    }
+
+    /**
+     * Finds a user associated with a specific token.
+     *
+     * @param tokenContent The content of the token.
+     * @return The user associated with the token.
+     */
+    public User findUserByToken(final String tokenContent) {
+        return userRepository.findUserById(tokenRepository.findTokenByTokenContent(tokenContent).getUser().getId());
     }
 
     @Override

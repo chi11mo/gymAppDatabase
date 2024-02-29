@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Getter // Lombok annotation to generate getters for all fields.
 @Setter // Lombok annotation to generate setters for all fields.
-public class TokenDto {
+public class TokenDTO {
     private Long id; // The unique identifier of the token.
     private String tokenContent; // The actual string content of the token.
     private LocalDateTime createdAt; // The date and time when the token was created.
@@ -20,7 +20,7 @@ public class TokenDto {
     private String username; // The username of the user associated with this token.
 
     /**
-     * Constructs a new TokenDto with specified details.
+     * Constructs a new TokenDTO with specified details.
      *
      * @param id           The unique identifier of the token.
      * @param tokenContent The actual string content of the token.
@@ -28,7 +28,7 @@ public class TokenDto {
      * @param expiresAt    The expiration date and time of the token.
      * @param username     The username of the associated user.
      */
-    public TokenDto(Long id, String tokenContent, LocalDateTime createdAt, LocalDateTime expiresAt, String username) {
+    public TokenDTO(Long id, String tokenContent, LocalDateTime createdAt, LocalDateTime expiresAt, String username) {
         this.id = id;
         this.tokenContent = tokenContent;
         this.createdAt = createdAt;
@@ -37,14 +37,14 @@ public class TokenDto {
     }
 
     /**
-     * Converts a Token entity to a TokenDto.
-     * This static method allows for easy conversion from Token entity instances to TokenDto instances.
+     * Converts a Token entity to a TokenDTO.
+     * This static method allows for easy conversion from Token entity instances to TokenDTO instances.
      *
      * @param token The Token entity to convert.
-     * @return A new TokenDto instance populated with data from the given Token entity.
+     * @return A new TokenDTO instance populated with data from the given Token entity.
      */
-    public static TokenDto fromToken(Token token) {
-        return new TokenDto(
+    public static TokenDTO fromToken(Token token) {
+        return new TokenDTO(
                 token.getId(),
                 token.getTokenContent(),
                 token.getCreatedAt(),

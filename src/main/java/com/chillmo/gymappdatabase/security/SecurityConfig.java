@@ -25,10 +25,10 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/users/signup", "/api/users/verify") // Disable CSRF protection for signup endpoint
+                        .ignoringRequestMatchers("/api/users/signup", "/api/users/verify","/api/signup/register","/api/healthdata/add") // Disable CSRF protection for signup endpoint
                 )
                 .authorizeRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/api/users/signup", "/api/users/verify", "/api/users/all").permitAll()
+                        .requestMatchers("/h2-console/**", "/api/users/signup", "/api/users/verify", "/api/users/all","/api/signup/register","/api/healthdata/add").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(myUserDetailsService)
