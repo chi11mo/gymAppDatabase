@@ -30,7 +30,7 @@ public class EmailService {
         email.setTo(user.getEmail());
         email.setSubject(subject);
         email.setText(mailContent);
-        mailSender.send(email);
+       // mailSender.send(email);
     }
 }
 

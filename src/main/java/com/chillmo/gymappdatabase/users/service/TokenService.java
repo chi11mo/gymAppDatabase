@@ -55,4 +55,7 @@ public interface TokenService {
      * @return a list of all TokenDTO's.
      */
     List<Token> getAllTokens();
+
+
+    boolean verifyToken(String token);
 }

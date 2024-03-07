@@ -17,7 +17,6 @@ import java.util.Set;
 @Table(name = "users", // Defines the table name for this entity.
         uniqueConstraints = {
                 // Define unique constraints for the table. Uncomment or add constraints as necessary.
-                // @UniqueConstraint(columnNames = "twitch"),
                 // @UniqueConstraint(columnNames = "email")
         })
 public class User {

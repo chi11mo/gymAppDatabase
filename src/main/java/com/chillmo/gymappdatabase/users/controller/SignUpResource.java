@@ -51,36 +51,5 @@ public class SignUpResource {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    /**
-     * Checks if a given token is active.
-     *
-     * @param token the token that is requested to be checked
-     * @return If the token is accepted or dismissed as string
-     */
-    @SuppressWarnings("PMD.LinguisticNaming")
-    @PutMapping("/validate/isTokenActive")
-    public ResponseEntity<String> isTokenActive(@RequestParam final String token) {
 
-        if (tokenService.findTokenByContent(token).getConfirmedAt() != null) {
-            return new ResponseEntity<>("ACCEPTED", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("DISMISSED", HttpStatus.OK);
-        }
-    }
-
-    /**
-     * Methode to send a Validation mail again.
-     *
-     * @param token token of the given User
-     * @return HttpStatus.OK
-     */
-    @SuppressWarnings("PMD.LocalVariableCouldBeFinal")
-    @PutMapping("/validateAgain")
-    public ResponseEntity<String> sendValidationMailAgain(@RequestParam final String token) {
-        User user = tokenService.findUserByToken(token);
-        final Token tokenByContent = tokenService.findTokenByContent(token);
-        tokenService.increaseExpiredTime(tokenByContent);
-        // mailService.sendValidationMail(user.getEMail(), tokenByContent);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }

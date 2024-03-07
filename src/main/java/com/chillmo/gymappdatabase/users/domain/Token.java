@@ -32,6 +32,8 @@ public class Token {
 
     private LocalDateTime confirmedAt; // Stores the date and time when the token was used/confirmed.
 
+
+
     @OneToOne(fetch = FetchType.LAZY) // Specifies a one-to-one relationship with the User entity.
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     // Maps this relationship to the "user_id" column in the "token" table.

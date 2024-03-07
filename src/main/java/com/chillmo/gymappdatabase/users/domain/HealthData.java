@@ -30,8 +30,6 @@ public class HealthData {
     @Column
     private double bodyFatPercentage;
 
-    @Column
-    private int steps;
 
     @Column
     private LocalDateTime savedAt;
@@ -54,15 +52,13 @@ public class HealthData {
      * @param height            the height of the user in meters.
      * @param weight            the weight of the user in kilograms.
      * @param bodyFatPercentage the body fat percentage of the user.
-     * @param steps             the number of steps taken by the user.
      * @param savedAt           the date when data is saved.
      * @param user              the associated User object this health data belongs to.
      */
-    public HealthData(double height, double weight, double bodyFatPercentage, int steps, LocalDateTime savedAt, User user) {
+    public HealthData(double height, double weight, double bodyFatPercentage, LocalDateTime savedAt, User user) {
         this.height = height;
         this.weight = weight;
         this.bodyFatPercentage = bodyFatPercentage;
-        this.steps = steps;
         this.savedAt = savedAt;
         this.user = user;
     }

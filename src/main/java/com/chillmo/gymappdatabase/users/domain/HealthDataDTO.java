@@ -12,7 +12,6 @@ public class HealthDataDTO {
     private double weight;
     private double height;
     private double bodyFatPercentage;
-    private int steps;
     private long userId; // Only include the user ID
 
     public HealthDataDTO() {

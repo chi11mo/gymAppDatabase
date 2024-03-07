@@ -25,7 +25,6 @@ public class HealthDataMapper {
         dto.setHeight(healthData.getHeight());
         dto.setWeight(healthData.getWeight());
         dto.setBodyFatPercentage(healthData.getBodyFatPercentage());
-        dto.setSteps(healthData.getSteps());
         dto.setUserId(healthData.getUser().getId()); // Only set the user ID for the DTO
         return dto;
     }
@@ -48,7 +47,6 @@ public class HealthDataMapper {
         healthData.setHeight(dto.getHeight());
         healthData.setWeight(dto.getWeight());
         healthData.setBodyFatPercentage(dto.getBodyFatPercentage());
-        healthData.setSteps(dto.getSteps());
         healthData.setUser(user);
         return healthData;
     }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -46,7 +47,6 @@ public class TokenServiceImpl implements TokenService {
     }
 
 
-
     @Override
     public Token findTokenByContent(final String content) {
         return tokenRepository.findTokenByTokenContent(content);
@@ -77,6 +77,28 @@ public class TokenServiceImpl implements TokenService {
      */
     public User findUserByToken(final String tokenContent) {
         return userRepository.findUserById(tokenRepository.findTokenByTokenContent(tokenContent).getUser().getId());
+    }
+
+    /**
+     * This Method verifies the given token.
+     *
+     * @param tokenContent given token content.
+     * @return boolean is token confirmed.
+     */
+    public boolean verifyToken(String tokenContent) {
+        Token tokenToVerify = tokenRepository.findTokenByTokenContent(tokenContent);
+        if (tokenToVerify == null) {
+            return false; // Token does not exist
+        }
+
+        if (tokenToVerify.getExpiresAt().isBefore(LocalDateTime.now())) {
+            return false; // Token has expired
+        } else {
+            tokenToVerify.setConfirmedAt(LocalDateTime.now());
+            tokenRepository.save(tokenToVerify);
+            return true; // Token is valid if it has not been confirmed/used yet
+        }
+
     }
 
     @Override
